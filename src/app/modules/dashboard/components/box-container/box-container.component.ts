@@ -15,6 +15,7 @@ export class BoxContainerComponent implements OnInit {
   @ViewChild("boxContainer") boxContainer: ElementRef;
 
   public boundary: any;
+  public hotkeysEnabled: boolean = true;
 
   constructor() { }
 
@@ -25,8 +26,13 @@ export class BoxContainerComponent implements OnInit {
     this.boundary = this.boxContainer.nativeElement.getBoundingClientRect() as DOMRect;
   }
 
-  public acivateBox(boxId) {
+  public acivateBox(event, boxId) {
+    if (event) event.stopPropagation();
     this.activatedBox = boxId;
+  }
+
+  public clearSelection() {
+    this.activatedBox = null;
   }
 
   public addBox() {
@@ -35,10 +41,14 @@ export class BoxContainerComponent implements OnInit {
   }
 
   @HostListener('document:keyup', ['$event'])
-  handleKeyboardEvent(event: KeyboardEvent) { 
+  handleKeyboardEvent(event: KeyboardEvent) {
+
+    if (!this.hotkeysEnabled) return;
     
-    if (event.key == "Delete" || event.key == "Backspace") {
-      this.boxes.splice(this.boxes.indexOf(this.activatedBox), 1);
+    if ((event.key == "Delete" || event.key == "Backspace") && this.boxes.indexOf(this.activatedBox) != -1 && this.activatedBox) {
+        this.boxes.splice(this.boxes.indexOf(this.activatedBox), 1);
+        this.boxIndex -= 1;
+        this.activatedBox = null;
     }
   }
 

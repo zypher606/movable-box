@@ -18,12 +18,17 @@ export class DraggableDirective implements AfterViewInit, OnDestroy  {
   // Drag handle
   private handle: HTMLElement;
   private delta = {x: 0, y: 0};
-  private offset = {x: 0, y: 0};
+  private offset = {x: 400, y: 400};
 
   private boxWidth = 220;
   private boxHeight = 64;
 
   private destroy$ = new Subject<void>();
+
+  private translateSpeed = 3;
+
+  private hotkeysEnabled: boolean = false;
+
 
   constructor(private elementRef: ElementRef, private zone: NgZone) {
   }
@@ -32,11 +37,26 @@ export class DraggableDirective implements AfterViewInit, OnDestroy  {
     this.handle = this.dragHandle ? document.querySelector(this.dragHandle) as HTMLElement :
                                     this.elementRef.nativeElement;
     this.target = document.querySelector(this.dragTarget) as HTMLElement;
+
+    this.initBoxLocation();
     this.setupEvents();
   }
 
   public ngOnDestroy(): void {
     this.destroy$.next();
+  }
+
+  private initBoxLocation() {
+
+    this.offset.x = window.innerWidth/2 - this.boxWidth/2;
+    this.offset.y = window.innerHeight/2 - this.boxHeight/2;
+
+    requestAnimationFrame(() => {
+      this.target.style.transform = `
+        translate(${this.offset.x}px,
+                  ${this.offset.y}px)
+      `;
+    });
   }
 
   private setupEvents() {
@@ -76,19 +96,29 @@ export class DraggableDirective implements AfterViewInit, OnDestroy  {
         this.translate();
       });
 
-      // mouseup$.pipe(
-      //   takeUntil(this.destroy$)
-      // ).subscribe(() => {
-      //   // this.offset.x = this.deltaX(this.offset.x, this.delta.x);
-      //   // this.offset.y = this.deltaY(this.offset.y, this.delta.y);
-      //   // this.boundX(this.offset.x) ? this.offset.x += this.delta.x : null;
-      //   // this.boundY(this.offset.y) ? this.offset.y += this.delta.y : null;
-      //   this.offset.x += this.delta.x;
-      //   this.offset.y += this.delta.y
-      //   // this.offset.x = this.deltaX(this.offset.x, this.delta.x);
-      //   // this.offset.y = this.deltaY(this.offset.y, this.delta.y);
-      //   this.delta = {x: 0, y: 0};
-      // });
+      mouseup$.pipe(
+        takeUntil(this.destroy$)
+      ).subscribe(() => {
+       
+        let X = this.offset.x + this.delta.x;
+        if (X  <= this.boundary.left) {
+          X = this.boundary.left;
+        } else if (X >= this.boundary.right - this.boxWidth) {
+          X = this.boundary.right - this.boxWidth;
+        }
+
+        let Y = this.offset.y + this.delta.y;
+        if (Y <= this.boundary.top) {
+          Y = this.boundary.top;
+        } else if (Y >= this.boundary.bottom - this.boxHeight) {
+          Y = this.boundary.bottom - this.boxHeight;
+        }
+
+        this.offset.x = X;
+        this.offset.y = Y;
+        
+        this.delta = {x: 0, y: 0};
+      });
     });
   }
 
@@ -96,24 +126,20 @@ export class DraggableDirective implements AfterViewInit, OnDestroy  {
     
     if(!this.isActive) return;
 
-    // if (this.offset.x + this.delta.x > this.boundary.left && this.offset.x + this.delta.x + this.boxWidth < this.boundary.right) {
-    //   this.offset.x += this.delta.x;
-    // }
+    let X = this.offset.x + this.delta.x;
+    if (X  <= this.boundary.left) {
+      X = this.boundary.left;
+    } else if (X >= this.boundary.right - this.boxWidth) {
+      X = this.boundary.right - this.boxWidth;
+    }
 
-    // this.offset.x = this.deltaX(this.offset.x, this.delta.x);
-    // this.offset.y = this.deltaY(this.offset.y, this.delta.y);
+    let Y = this.offset.y + this.delta.y;
+    if (Y <= this.boundary.top) {
+      Y = this.boundary.top;
+    } else if (Y >= this.boundary.bottom - this.boxHeight) {
+      Y = this.boundary.bottom - this.boxHeight;
+    }
 
-    // if (this.offset.y + this.delta.y > this.boundary.top && this.offset.y + this.delta.y + this.boxHeight < this.boundary.bottom) {
-      // }
-    // this.offset.x += this.delta.x;
-
-    // this.offset.y += this.delta.y;
-    
-    let X = this.offset.x;
-    let Y = this.offset.y;
-
-    this.boundX(X) ? X += this.delta.x : null;
-    this.boundY(Y) ? Y += this.delta.y : null;
 
     requestAnimationFrame(() => {
       this.target.style.transform = `
@@ -123,21 +149,29 @@ export class DraggableDirective implements AfterViewInit, OnDestroy  {
     });
   }
 
+  @Input("hotkeysEnabled")
+  set setHotkeysConfig(value: boolean) {
+    this.hotkeysEnabled = value;
+  }
+
+
   @HostListener('document:keypress', ['$event'])
   handleKeyboardEvent(event: KeyboardEvent) { 
+
+    if (!this.hotkeysEnabled) return;
     
     switch (event.key) {
       case 'w':
-        this.translateXY(0, -2);
+        this.translateXY(0, -this.translateSpeed);
         break;
       case 'a':
-        this.translateXY(-2, 0);
+        this.translateXY(-this.translateSpeed, 0);
         break;
       case 's':
-        this.translateXY(0, 2);
+        this.translateXY(0, this.translateSpeed);
         break;
       case 'd':
-        this.translateXY(2, 0);
+        this.translateXY(this.translateSpeed, 0);
         break;
     }
   }

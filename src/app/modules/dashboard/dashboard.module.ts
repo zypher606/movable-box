@@ -6,17 +6,20 @@ import { DashboardComponent } from './components/dashboard/dashboard.component';
 import { BoxContainerComponent } from './components/box-container/box-container.component';
 import { BoxComponent } from './components/box/box.component';
 import { DraggableDirective } from './directives/draggable/draggable.directive';
+import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 
 @NgModule({
   declarations: [
     DashboardComponent,
     BoxContainerComponent,
     BoxComponent,
-    DraggableDirective
+    DraggableDirective,
   ],
   imports: [
     CommonModule,
-    DashboardRoutingModule
+    DashboardRoutingModule,
+    ReactiveFormsModule,
+    FormsModule
   ]
 })
 export class DashboardModule { }

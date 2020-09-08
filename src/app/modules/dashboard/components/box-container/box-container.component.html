@@ -1,27 +1,45 @@
   
 <div class="card-container">
-    <a (click)="addBox()" class="card" target="_blank" rel="noopener">
-      <svg class="material-icons" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+    <div class="action-btns">
+        <a (click)="addBox()" class="card" target="_blank" rel="noopener">
+            <svg class="material-icons" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+      
+            <span>Add box</span>
+      
+          </a>
+    </div>
+    
 
-      <span>Add box</span>
+    <div class="hotkey-config">
+        Enable Keyboard hotkeys
+        <label class="switch">
+            <input [(ngModel)]="hotkeysEnabled" type="checkbox" checked>
+            <span class="slider round"></span>
+        </label>
+    </div>
 
-    </a>
+    <br><br><br>
+    <p style="text-align: center;">Use W-A-S-D and Del key for keyboard actions</p>
+    <br><br>
+    
 
 </div>
 
-<div #boxContainer class="card-container box-container">
+<div (click)="clearSelection()" #boxContainer class="card-container box-container">
   
     <app-box 
         appDraggable
         *ngFor="let box of boxes; let i = index;"
-        (mousedown)="acivateBox(box)"
-        (click)="acivateBox(box)"
+        [ngStyle]="{'z-index': i + 1}"
+        (mousedown)="acivateBox(null, box)"
+        (click)="acivateBox($event, box)"
         [isActive]="box == activatedBox" 
         [ngClass]="{'active': box == activatedBox}"
         id="{{box}}"
         class="box-item"
         [box]="box"
         [boundary]="boundary"
+        [hotkeysEnabled]="hotkeysEnabled"
         [dragTarget]="'#' + box">
     </app-box>
 
