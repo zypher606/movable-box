@@ -7,23 +7,24 @@ import { Component, OnInit, HostListener, ViewChild, ElementRef } from '@angular
 })
 export class BoxContainerComponent implements OnInit {
 
-  public activatedBox: any;
+  public activatedBox: any = null;
 
   private boxIndex = 2;
   public boxes = ['box-0', 'box-1'];
   
   @ViewChild("boxContainer") boxContainer: ElementRef;
 
-  public boundary: any;
+  public boundary: DOMRect = null;
   public hotkeysEnabled: boolean = true;
 
   constructor() { }
 
   ngOnInit(): void {
+
   }
 
   ngAfterViewInit() : void {
-    this.boundary = this.boxContainer.nativeElement.getBoundingClientRect() as DOMRect;
+    setTimeout(() => this.boundary = this.boxContainer.nativeElement.getBoundingClientRect() as DOMRect, 300)
   }
 
   public acivateBox(event, boxId) {
