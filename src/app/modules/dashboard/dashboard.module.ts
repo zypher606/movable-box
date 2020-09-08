@@ -5,12 +5,14 @@ import { DashboardRoutingModule } from './dashboard-routing.module';
 import { DashboardComponent } from './components/dashboard/dashboard.component';
 import { BoxContainerComponent } from './components/box-container/box-container.component';
 import { BoxComponent } from './components/box/box.component';
+import { DraggableDirective } from './directives/draggable/draggable.directive';
 
 @NgModule({
   declarations: [
     DashboardComponent,
     BoxContainerComponent,
-    BoxComponent
+    BoxComponent,
+    DraggableDirective
   ],
   imports: [
     CommonModule,

@@ -1,4 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, HostListener, ElementRef, EventEmitter, Input } from '@angular/core';
+import { Observable } from 'rxjs';
+import {debounceTime, distinctUntilChanged, map, startWith, tap} from 'rxjs/operators';
 
 @Component({
   selector: 'app-box',
@@ -7,9 +9,15 @@ import { Component, OnInit } from '@angular/core';
 })
 export class BoxComponent implements OnInit {
 
-  constructor() { }
+  @Input() box: any;
+
+  constructor(
+    public element: ElementRef
+  ) { 
+  }
 
   ngOnInit(): void {
   }
+
 
 }
